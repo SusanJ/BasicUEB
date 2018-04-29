@@ -8,12 +8,14 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStreamRewriter;
+import org.antlr.v4.runtime.Vocabulary;
 
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.lang.Character;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -22,9 +24,13 @@ import java.io.Reader;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Pattern;
+
+//import org.dotlessbraille.utilities.Tape5;
 
  public class BasicTranslator extends aPlusParserBaseListener{
  public static boolean printTree = true;
+ public static Tape6 myOutput = new Tape6( "brlout.txt" );
 
    HashMap<String,String> ink2UEB =
   new HashMap<String,String>();
@@ -39,8 +45,25 @@ import java.util.HashMap;
    ParseTreeProperty<String> ueb =
   new ParseTreeProperty<String>();
 
-  BasicTranslator(){;}
+  Vocabulary VOCABULARY;
+  boolean skipLeafierNodes = false;
+  boolean skipUcLet = false;
+  boolean followLowerNodes = false;
+  boolean debug = false;
+  boolean testVOCAB = false;
+  BufferedTokenStream allTokens;
 
+  BasicTranslator( BufferedTokenStream allTokens ){
+   this.VOCABULARY= aPlusParser.VOCABULARY;
+   this.allTokens = allTokens;
+  // makeTable();
+    //System.out.println( "ET object." );
+   //EasyTrans et = new EasyTrans();
+   //System.out.println( "ET table." );
+   EasyTrans.makeTable();
+  }
+
+ //===================================================
    //Annotate a tree node with its translation
   void setUEB( ParseTree ctx, String s ){
    ueb.put( ctx, s );
@@ -49,183 +72,574 @@ import java.util.HashMap;
   String getUEB( ParseTree ctx ) {
    return ueb.get( ctx );
   }
-
-  String getBrl( String ink ){
-   boolean has = ink2UEB.containsKey( ink );
-   System.out.println("   "+ink+" table key: "+has );
-   return ink2UEB.get( ink );
-  }
-
-   //  Simple table requires grammar information from parser
-   // Print input recognizes all 94 ASCII characters
-   // Braille output uses North Am. ASCII Braille 
-   // translation using ASCII small letters
-  void makeTable(){
-
-  //Cap letters
-ink2UEB.put( "A", ",a" );
-ink2UEB.put( "B", ",b" );
-ink2UEB.put( "C", ",c" );
-
-  //Small letters
-ink2UEB.put( "a", "a" );
-ink2UEB.put( "b", "b" );
-ink2UEB.put( "c", "c" );
-
-  //"Large" signs
-ink2UEB.put( "and", "&" );
-ink2UEB.put( "for", "=" );
-ink2UEB.put( "of", "(" );
-ink2UEB.put( "the", "!" );
-ink2UEB.put( "with", ")" );
-ink2UEB.put( "And", ",&" );
-ink2UEB.put( "For", ",=" );
-ink2UEB.put( "Of", ",(" );
-ink2UEB.put( "The", ",!" );
-ink2UEB.put( "With", ",)" );
-
-  //Alphabetic word signs
-  //The lexer gets these no matter the context ???
-ink2UEB.put( "but", "b" );
-ink2UEB.put( "But", ",b" );
-ink2UEB.put( "can", "c" );
-ink2UEB.put( "Can", ",c" );
-ink2UEB.put( "do", "d" );
-ink2UEB.put( "Do", ",d" );
-ink2UEB.put( "every", "e" );
-ink2UEB.put( "Every", ",e" );
-ink2UEB.put( "from", "f" );
-ink2UEB.put( "From", ",f" );
-ink2UEB.put( "go", "g" );
-ink2UEB.put( "Go", ",g" );
-ink2UEB.put( "have", "h" );
-ink2UEB.put( "Have", ",h" );
-ink2UEB.put( "like", "l" );
-ink2UEB.put( "Like", ",l" );
-ink2UEB.put( "more", "m" );
-ink2UEB.put( "More", ",m" );
-
-ink2UEBalt.put( "but", "but" );
-ink2UEBalt.put( "can", "can" );
-ink2UEB.putalt( "do", "do" );
-ink2UEBalt.put( "every", "ev]ry" );
-ink2UEBalt.put( "from", "from" );
-ink2UEBalt.put( "go", "go" );
-ink2UEB.putalt( "have", "h" );
-ink2UEBalt.put( "just", "ju/" );
-ink2UEBalt.put( "knowledge", "\"kl$ge" );
-ink2UEBalt.put( "like", "like" );
-ink2UEBalt.put( "more", "more" );
-ink2UEBalt.put( "rather", "ra?]");
-ink2UEBalt.put( "that", "?at");
-ink2UEBalt.put( "very", "v]y");
-ink2UEBalt.put( "you",  "you");
-ink2UEBalt.put( "it", "it" );
-
-
-
-  
-ink2UEB.put( "en", "5" );
-ink2UEB.put( "En", ",5" );
-ink2UEB.put( "in", "9" );
-ink2UEB.put( "In", ",9" );
-
-   //Strong word signs
-ink2UEB.put( "child", "*"  );
-ink2UEB.put( "Child", ",*" );
-ink2UEB.put( "shall", "%"  );
-ink2UEB.put( "Shall", ",%" );
-ink2UEB.put( "still", "/"  );
-ink2UEB.put( "Still", ",/" );
-ink2UEB.put( "which", ":"  );
-ink2UEB.put( "Which", ",:" );
-ink2UEB.put( "this",  "?"  );
-ink2UEB.put( "This",  ",?" );
-ink2UEB.put( "out",  "\\"  );
-ink2UEB.put( "Out",  ",\\" );
-
-   //Initial-letter contractions
-ink2UEB.put( "upon", "^u");
-ink2UEB.put( "Upon", ",^u" );
-ink2UEB.put( "cannot", "_c" );
-ink2UEB.put( "Cannot", ",_c" );
-ink2UEB.put( "day", "\"d" );
-ink2UEB.put( "Day", ",\"d" );
-
-  //String group signs
-ink2UEB.put( "ch", "*"  );
-ink2UEB.put( "Ch", ",*" );
-ink2UEB.put( "sh", "%"  );
-ink2UEB.put( "Sh", ",%" );
-ink2UEB.put( "st", "/"  );
-ink2UEB.put( "St", ",/" );
-ink2UEB.put( "wh", ":"  );
-ink2UEB.put( "Wh", ",:" );
-ink2UEB.put( "th",  "?" );
-ink2UEB.put( "Th",  ",?" );
-ink2UEB.put( "ou",  "\\"  );
-ink2UEB.put( "Ou",  ",\\" );
-
-  //Final-letter contractions
-ink2UEB.put( "ment", ";t");
-
-  //Punctuation
-ink2UEB.put( ",", "1");
-ink2UEB.put( ";", "2");
-ink2UEB.put( ":", "3");
-ink2UEB.put( ".", "4");
-ink2UEB.put( "!", "6");
-ink2UEB.put( "?", "8");
-ink2UEB.put( "'", "'");
-ink2UEB.put( " ", " ");
-
-  //Lower numbers
-ink2UEB.put( "0", "j" );
-ink2UEBalt.put( "0", "#j" );
-ink2UEB.put( "1", "a" );
-ink2UEBalt.put( "1", "#a" );
-
-  //Special symbols
-ink2UEB.put( "$", "@s" );
-
-System.out.println( "Transtable size: "+ink2UEB.size() );
-
-  }
+//====================================================
 
 @Override 
   public void exitLine( aPlusParser.LineContext ctx){
-    System.out.println( "Line found!" );
-    System.out.println( ctx.getText() );
+
+    System.out.println( "\n Line input: " + ctx.getText());
+    //System.out.println( ctx.getText() );
     int cnt = ctx.getChildCount();
+    System.out.println( "Line has: "+cnt+" child nodes." );
     String ink;
     String brl;
-    StringBuilder buf;
+    StringBuilder buf = new StringBuilder();;
+
      //Gets UEB from lower nodes where available
-    for (int i=0; i<cnt; i++){
+    for (int i=0; i<cnt-1; i++){
      brl = getUEB( ctx.getChild(i) );
      ink = ctx.getChild(i).getText();
      if (brl == null){
-      System.out.println( "Did not yet get trans for: "+ink );
-      brl = getBrl( ink );
-      System.out.println( "\n Input: "+ink+" UEB: "+brl );
+      if (ink.equals( " ")){
+        brl = ink;
+      } else {
+       System.out.println( "Did not yet get trans for: |"+ink+"|");
+       brl = EasyTrans.getBrl( ink );
+       System.out.println( "\n Input: "+ink+" UEB: |"+brl+"|" );
+       }
      }
+     buf.append( brl );
     }
+      //NEWLINE??
+    setUEB( ctx, buf.toString() );
+    int inputLen = ctx.getText().length();
+    System.out.println( "inputLen: "+inputLen );
+    int last = inputLen-2;
+    String noNL = ctx.getText().substring( 0, last ); 
+
+    System.out.println( "Input: "+noNL
+                       +" UEB: "+ buf.toString());
+}
+@Override
+  public void enterSymseq(aPlusParser.SymseqContext ctx){
+  skipLeafierNodes = false;
+  String ink = ctx.getText();
+
+  if (debug){
+   System.out.println( "\n   enterSymseq input: "+ink );
   }
+
+  boolean titleCase = false;
+  if (ink.length() < 2) return;
+
+  if (!EasyTrans.alphabetic( ink )) return;
+
+   //Second pass to find pre-translated words
+
+  //if (ink.length() > 1){
+   char beg  = ink.charAt( 0 );
+   boolean up = Character.isUpperCase( beg );
+   if (up){
+    String actualRest = ink.substring(1);
+    String ifLcRest = actualRest.toLowerCase();
+    if (actualRest.equals( ifLcRest )) titleCase = true;
+   }
+   if (debug){
+    System.out.println( "Is input titlecase? "+titleCase );
+   }
+  //};
+
+boolean testVOCAB = true;
+if (testVOCAB){
+    Token myFirst = ctx.getStart();
+    int tokenb = myFirst.getTokenIndex();
+    Token myLast = ctx.getStop();
+    int tokene = myLast.getTokenIndex();
+
+    String mySymName = 
+      VOCABULARY.getSymbolicName( myFirst.getType() );
+    System.out.println( "SymbolicName: "+mySymName );
+    String myLitName = 
+     VOCABULARY.getLiteralName( myFirst.getType() );
+    System.out.println( "LiteralName: "+myLitName );
+    String myDisName = 
+     VOCABULARY.getDisplayName( myFirst.getType() );
+    System.out.println( "DisplayName: "+myDisName );
+
+    System.out.println( "Symseq starting token type: "+
+       myFirst.getType()+" index: "+tokenb);
+    System.out.println( "Symseq ending token type: "+
+       myLast.getType()+" index: "+tokene);
+}
+  
+  String brl;
+  //If input is title case check as lower case and if that
+  //matches prepend dot6  ASSUMPTION 
+
+  if (titleCase){
+    brl = EasyTrans.getPreTrans( ink.toLowerCase() );
+    if (brl != null) {
+     brl = ","+brl;
+        if (debug){
+         System.out.println( "enterSymseq brl: "+brl );}
+     setUEB( ctx, brl );
+     skipLeafierNodes = true;
+    }
+  } else {  //Not titleCase
+    //This is NOT always appropriate, what if it is a number? 
+    //Only if alphabetic!!!!  
+    brl = EasyTrans.getPreTrans( ink );
+    if (brl != null){
+       if (debug){
+        System.out.println( "enterSymseq brl: "+brl );
+       }
+     setUEB( ctx, brl );
+     skipLeafierNodes = true;    
+    }
+   }
+ }//End eEnterSymseq().
 
 @Override
   public void exitSymseq(aPlusParser.SymseqContext ctx){
-  System.out.println( "Symbol sequence found!" );
-    System.out.println( ctx.getText() );
+/** symseq:  punc*
+         (conword  //Word containing contractions
+         |letter   //One small letter standing alone
+         |word     //Alphabetic word
+         |tc_word  //Titlecase alphabetic word
+         |freqword //Frequently used word with a whole word con.
+         |not_lc   //Symbol-sequence with no small letters
+         |uc_seq   //Uppercase alphabetic word
+         |uc_let
+         ) punc*;
+  alphabetic word: 
+*/
+    //Cases where a whole-word pretranslation was available
+  if (skipLeafierNodes){
+   System.out.println( "\n   exitSymseq--Input: "+ctx.getText()
+              +" UEB: "+ getUEB( ctx) );
+   myOutput.println( "\n   exitSymseq--Input: "+ctx.getText()
+              +" UEB: "+ getUEB( ctx) );
+   skipLeafierNodes = false;
+   return;
+  }
+
+  //if (debug)
+  System.out.println( "Starting to finish symbol seq input: "+
+                       ctx.getText() );
+    
     int cnt = ctx.getChildCount();
     String ink;
     String brl;
+    StringBuilder buf = new StringBuilder();
+
+   if (testVOCAB){
+    Token myFirst = ctx.getStart();
+    int tokenb = myFirst.getTokenIndex();
+    Token myLast = ctx.getStop();
+    int tokene = myLast.getTokenIndex();
+
+    String mySymName = 
+      VOCABULARY.getSymbolicName( myFirst.getType() );
+    System.out.println( "SymbolicName: "+mySymName );
+    String myLitName = 
+     VOCABULARY.getLiteralName( myFirst.getType() );
+    System.out.println( "LiteralName: "+myLitName );
+    String myDisName = 
+     VOCABULARY.getDisplayName( myFirst.getType() );
+    System.out.println( "DisplayName: "+myDisName );
+
+    System.out.println( "Symseq starting token type: "+
+       myFirst.getType()+" index: "+tokenb);
+    System.out.println( "Symseq ending token type: "+
+       myLast.getType()+" index: "+tokene);
+   }
+
+    //for (int t = tokenb; t = tokene; t++){
+    //};
+    
+
+      //In current grammar it USUALLY only has one child
+    //if (debug)
+
+    System.out.println( "ExitSymseq--Number of child nodes: "+cnt );
+    for (int i=0; i<cnt; i++){
+      brl = getUEB( ctx.getChild(i) );
+      //Token child = ctx.getChild(i);
+      //System.out.println( "Child token type: "+child.getType() );
+      if (brl == null){
+        ink = ctx.getChild(i).getText();
+        //if (debug)
+        System.out.println( "Missing brl for child: |"+ink+"|" );
+        brl = EasyTrans.getBrl( ink );
+        //if (debug)
+        System.out.println( "\n      -->I got: "+ink+" UEB: "+brl );
+        setUEB( ctx.getChild(i), brl ); //not nec. at this high level
+      }
+     buf.append( brl );
+    }
+     System.out.println( "Symseq--Input: "+ctx.getText()
+              +" UEB: "+ buf.toString());
+     myOutput.println( "Symseq--Input: "+ctx.getText()
+              +" UEB: "+ buf.toString());
+     setUEB( ctx, buf.toString() );
+  }//End exitSymseq.
+
+@Override 
+public void exitG1Letter(aPlusParser.G1LetterContext ctx) {
+ //Letters that require a leading grade 1 indicator. 
+ String brl = EasyTrans.getAltBrl( ctx.getText());
+ setUEB( ctx, brl );
+}
+@Override
+ public void exitLetterseq(aPlusParser.LetterseqContext ctx) {
+   System.out.println( "exitLetterSeq with "+ctx.getChildCount()+
+     " child sequences." ); 
+
+  boolean skipVocab = true;
+   //There is enough info here to do the caps symbol and word inds and
+   //any necessary term ind for a UC seq not at the end
+if (skipVocab){
+   Token myFirst = ctx.getStart();
+    int tokenb = myFirst.getTokenIndex();
+    Token myLast = ctx.getStop();
+    int tokene = myLast.getTokenIndex();
+
+    String mySymName = 
+      VOCABULARY.getSymbolicName( myFirst.getType() );
+    System.out.println( "1st token symbolicName: "+mySymName );
+    String myDisName = 
+     VOCABULARY.getDisplayName( myFirst.getType() );
+    System.out.println( "1st token displayName: "+myDisName );
+
+    System.out.println( "Symseq starting token type: "+
+       myFirst.getType()+" index: "+tokenb);
+    System.out.println( "Symseq ending token type: "+
+       myLast.getType()+" index: "+tokene);
+        //What if there is another channel?
+        //Should at least be one more token
+    int nextToken = tokene+1;
+    System.out.println( "Symseq ending token type: "+
+       myLast.getType()+" index: "+tokene);
+     //Get token from token index???
+    Token nextTok = allTokens.get( nextToken );
+   System.out.println( "Symseq ending token type: "+
+       nextTok.getType()+" indexOfNext: "+nextToken);
+}
+
+    int cnt = ctx.getChildCount();
+    System.out.println( "  Letter sequence: "+cnt+" child nodes." );
+    String ink;
+    String brl;
+    StringBuilder buf = new StringBuilder();;
+
+     //Gets UEB from lower nodes where available
+    for (int i=0; i<cnt-1; i++){
+     brl = getUEB( ctx.getChild(i) );
+     ink = ctx.getChild(i).getText();
+     //if (brl == null){
+      //System.out.println( "Did not yet get trans for: |"+ink+"|");
+      //brl = EasyTrans.getBrl( ink );
+      //System.out.println( "\n Input: "+ink+" UEB: |"+brl+"|" );
+     //}
+     buf.append( brl );
+    }
+      //NEWLINE??
+    setUEB( ctx, buf.toString() );
+}//End exitLetterseq.
+
+@Override
+  public void exitSpunc(aPlusParser.SpuncContext ctx) { 
+  if (followLowerNodes){
+    System.out.println( "  In exitSpunc" );
+   }
+   String ink = ctx.getText();
+   String brl = EasyTrans.getBrl( ink );
+   if (brl != null){
+    setUEB( ctx, brl );
+   }
+  System.out.println( "Spunc--input: "+ink+" UEB: "+brl );
+  }//End exitSpunc.
+@Override
+  public void exitEpunc(aPlusParser.EpuncContext ctx) { 
+   if (followLowerNodes){
+    System.out.println( "  In exitEpunc" );
+   }
+   String ink = ctx.getText();
+   String brl = EasyTrans.getBrl( ink );
+   if (brl != null){
+    setUEB( ctx, brl );
+   }
+  System.out.println( "Epunc--input: "+ink+" UEB: "+brl );
+  }//End exitEpunc.
+
+@Override
+  public void exitConword(aPlusParser.ConwordContext ctx) {
+   if( skipLeafierNodes) return;
+   String word = ctx.getText();
+if (followLowerNodes)
+   System.out.println( "  In exitConword--Word to be contracted: "+word );
+    String ink;
+    String brl;
+    int cnt = ctx.getChildCount();
+    StringBuilder buf = new StringBuilder();
     for (int i=0; i<cnt; i++){
      ink = ctx.getChild(i).getText();
-     brl = getBrl( ink );
-     System.out.println( "\n Input: "+ink+" UEB: "+brl );
-     setUEB( ctx.getChild(i), brl );
+     brl = getUEB( ctx.getChild(i) );
+if (followLowerNodes)
+     System.out.println( "\n      -->Input: "+ink+" UEB: |"+brl+"|" );
+     //System.out.println( "\n      -->Input: "+ink );
+     if (brl == null){
+      System.out.println( "OOPS -- was counting on child nodes." );
+     }
+     buf.append( brl );
     }
+if (followLowerNodes)
+   System.out.println( "Conword -- UEB concat: "+buf.toString() );
+   setUEB(ctx, buf.toString() );
  }
+@Override 
+public void exitStartconword(aPlusParser.StartconwordContext ctx) {
+   if( skipLeafierNodes) return;
+    if (followLowerNodes) System.out.println( "  In exitStartconword" );
+
+   int cnt = ctx.getChildCount();
+   if (cnt != 1){
+     System.out.println( "Logic error in exitStartconword--cnt: "+cnt );
+     System.exit( 1 );
+   }
+
+   String brl = getUEB( ctx.getChild( 0 ));
+   if (brl != null){
+     if (followLowerNodes) System.out.println( "Child trans to save: "+brl );
+   } else {
+     if (debug) System.out.println( "Expected child trans.");
+     brl = EasyTrans.getBrl( ctx.getChild(0).getText() );
+   }
+   setUEB( ctx, brl );
+ }
+@Override 
+public void exitStartConTC(aPlusParser.StartConTCContext ctx) {
+   if( skipLeafierNodes) return;
+   if (followLowerNodes) System.out.println( "  In exitStartConTC" );
+   int cnt = ctx.getChildCount();
+   if (cnt != 1){
+     System.out.println( "Logic error in exitStartConTC--cnt: "+cnt );
+     System.exit( 1 );
+   }
+   String brl = EasyTrans.getBrl( ctx.getText() );
+   setUEB( ctx, brl );
+}
+@Override 
+public void exitMidCon(aPlusParser.MidConContext ctx) {
+   if( skipLeafierNodes) return;
+   if (followLowerNodes){
+    System.out.println( "  In exitMidCon" );
+   }
+   int cnt = ctx.getChildCount();
+   if (cnt != 1){
+     System.out.println( "Logic error in exitMidCon--cnt: "+cnt );
+     System.exit( 1 );
+   }
+   String brl = EasyTrans.getBrl( ctx.getText() );
+   setUEB( ctx, brl );
+}
+@Override
+ public void exitMidendconword(aPlusParser.MidendconwordContext ctx) {
+   if( skipLeafierNodes) return;
+  if (followLowerNodes)  System.out.println( "  In exitMidendconWord" );
+    //Can translate any remaining children
+   int cnt = ctx.getChildCount();
+   
+   String brl;
+   StringBuilder buf = new StringBuilder();
+   for (int i=0; i<cnt; i++){
+    brl = getUEB( ctx.getChild( i ));
+    if (brl != null){
+      if (followLowerNodes)
+        System.out.println( "Child provided translation "+
+        "to use here: "+brl );
+      buf.append( brl );
+    } else {
+      brl = EasyTrans.getBrl( ctx.getText() );
+      System.out.println( "Got translation: "+brl );
+      buf.append( brl );
+    }
+   }
+   setUEB( ctx, buf.toString() ) ;
+}
+@Override
+ public void exitSmall(aPlusParser.SmallContext ctx) { 
+   if (skipLeafierNodes) return;
+   String ink = ctx.getText();
+   String brl = EasyTrans.getBrl( ink );
+   setUEB( ctx, brl );
+ }
+@Override
+ public void exitUc_let(aPlusParser.Uc_letContext ctx) { 
+  if( skipLeafierNodes) return;
+  if (skipUcLet) return;
+  String ink = ctx.getText();
+  String brl = EasyTrans.getBrl( ink );
+  setUEB( ctx, brl );
+ }
+@Override public void enterUc_seq(aPlusParser.Uc_seqContext ctx) {
+  System.out.println( "  In enterUc_seq" );
+  //Since this is sequence we don't want the individual uc
+  //letters to each have a dot6!
+  boolean skipUcLet = true;
+ }
+@Override public void exitUc_seq(aPlusParser.Uc_seqContext ctx) {
+  System.out.println( "  In exitUc_seq" );
+ 
+
+   String ink = ctx.getText();
+   int cnt = ctx.getChildCount();
+   System.out.println( "\n  exitUc_seq: "+ ink +
+      " no. of child nodes: "+cnt );
+   skipUcLet = false;
+    //Translate letters
+   StringBuilder buf = new StringBuilder(",,");
+   String brl;
+   for (int i=0; i<cnt; i++){
+    brl = EasyTrans.getAltBrl( ctx.getChild(i).getText() );
+    buf.append( brl );
+   }
+   System.out.println( "  UC sequence: "+buf.toString() );
+   setUEB( ctx, buf.toString() );
+ }
+@Override
+ public void exitAnywhereCon(aPlusParser.AnywhereConContext ctx) { 
+    if( skipLeafierNodes) return;
+  if (followLowerNodes) System.out.println( "  In AnywhereCon" );
+  
+   int cnt = ctx.getChildCount();
+   if (cnt != 1){
+     System.out.println( "Logic error in exitAnywhereCont--cnt: "+cnt );
+     System.exit( 1);
+   }
+   String brl = getUEB( ctx.getChild( 0 ));
+   if (brl != null){
+      if (followLowerNodes) System.out.println( "Child trans to save: "+brl );
+   } else {
+     brl = EasyTrans.getBrl( ctx.getText() );
+      if (followLowerNodes) System.out.println( "Got trans: "+brl );
+   }
+   setUEB( ctx, brl );
+ }
+
+   //'Garbage' is random sequences that were't otherwise recognized
+@Override
+ public void exitGarbage(aPlusParser.GarbageContext ctx) { 
+   String brl;
+   StringBuilder buf = new StringBuilder();
+   for (int i=0; i<ctx.getChildCount(); i++){
+    brl = getUEB( ctx.getChild( i ));
+    buf.append( brl );
+   }
+   System.out.println( "   In exitGarbage--output "+ buf.toString() );
+   setUEB( ctx, buf.toString() ) ;
+}
+     //UEB Upper Numbers
+
+  //Not lc handles all sequence w/o small letters but typically
+  // numbers
+@Override
+  public void exitNot_lc(aPlusParser.Not_lcContext ctx) {
+   String ink = ctx.getText();
+   int cnt = ctx.getChildCount();
+    if (followLowerNodes) System.out.println( "   In exitNot_lc--input "+ ink +
+      " no. of child nodes: "+cnt );
+ 
+   String brl;
+   StringBuilder buf = new StringBuilder();
+   for (int i=0; i<cnt; i++){
+    brl = getUEB( ctx.getChild( i ));
+    if (brl != null){
+       if (followLowerNodes) System.out.println( "Child provided translation "+
+        "to use here: "+brl );
+      buf.append( brl );
+    } else {
+      brl = EasyTrans.getBrl( ctx.getText() );
+       if (followLowerNodes) System.out.println( "Got translation: "+brl );
+      buf.append( brl );
+    }
+   }
+   System.out.println( "   In exitNot_lc--output "+ buf.toString() );
+   setUEB( ctx, buf.toString() ) ;
+  }
+@Override
+ public void exitNumber(aPlusParser.NumberContext ctx) {
+   String ink = ctx.getText();
+   int cnt = ctx.getChildCount();
+   System.out.println( "\n  In exitNumber: "+ ink +
+      " no. of child nodes: "+cnt );
+
+    //Concatenate numeric ind. and any other digits
+   StringBuilder buf = new StringBuilder();
+   for (int i=0; i<cnt; i++){
+    buf.append(getUEB( ctx.getChild( i )));
+   }
+   System.out.println( "  Number: "+buf.toString() );
+   setUEB( ctx, buf.toString() );
+ }
+@Override
+ public void exitInteger(aPlusParser.IntegerContext ctx) {
+   String ink = ctx.getText();
+   int cnt = ctx.getChildCount();
+   System.out.println( "\n  In exitInteger: "+ ink +
+      " no. of digits: "+cnt );
+
+    //Concatenate numeric ind. and any other digits
+   StringBuilder buf = new StringBuilder();
+   for (int i=0; i<cnt; i++){
+    buf.append(getUEB( ctx.getChild( i )));
+   }
+   System.out.println( "  Upper integer: "+buf.toString() );
+   setUEB( ctx, buf.toString() );
+ }
+@Override
+ public void exitDecpt(aPlusParser.DecptContext ctx) {
+   String ink = ctx.getText();
+   System.out.println( "In exitDecpt "+ ink );
+   String brl = EasyTrans.getBrl( ink );
+   System.out.println( "Decimal point: "+brl );
+   setUEB( ctx, brl );
+ }
+@Override
+ public void exitReal(aPlusParser.RealContext ctx) {
+   String ink = ctx.getText();
+   int cnt = ctx.getChildCount();
+   System.out.println( "\n  In exitReal: "+ ink +
+      " no. of digits: "+cnt );
+
+    //Concatenate numeric ind. and any other digits
+   StringBuilder buf = new StringBuilder();
+   for (int i=0; i<cnt; i++){
+    buf.append(getUEB( ctx.getChild( i )));
+   }
+   System.out.println( "  Upper real number: "+buf.toString() );
+   setUEB( ctx, buf.toString() );
+ }
+@Override
+ public void exitStartNum(aPlusParser.StartNumContext ctx) {
+   String ink = ctx.getText();
+   System.out.println( "In exitStartNum: "+ ink );
+     //AltBrl prepends #
+   String brl = EasyTrans.getAltBrl( ink );
+   System.out.println( "Upper number: "+brl );
+   setUEB( ctx, brl );
+ }
+@Override 
+ public void exitStartDec(aPlusParser.StartDecContext ctx) {
+  String ink = ctx.getText();
+   System.out.println( "In exitStartDc: "+ ink );
+     //AltBrl prepends #
+   String brl = EasyTrans.getAltBrl( ink );
+   System.out.println( "Upper number decimal point: "+brl );
+   setUEB( ctx, brl );
+ } 
+@Override
+ public void exitDig(aPlusParser.DigContext ctx) {
+   String ink = ctx.getText();
+   System.out.println( "In exitDig "+ ink );
+   String brl = EasyTrans.getBrl( ink );
+   System.out.println( "Upper number: "+brl );
+   setUEB( ctx, brl );
+ }
+// public void enterAlphaseq(aPlusParser.AlphaseqContext ctx) {
+ //@Override
+ // public void exitSymseq(aPlusParser.SymseqContext ctx){
+
 
 //===========================================================
   public static void main( String[] args ) throws Exception {
@@ -257,6 +671,8 @@ System.out.println( "Transtable size: "+ink2UEB.size() );
     }
   }
 
+  //Tape6 myOutput = new Tape6( "uebout.txt" );
+
 /**  I. Connect lexer and parser and instruct parser to
         build a parse tree.  
 */
@@ -264,6 +680,9 @@ System.out.println( "Transtable size: "+ink2UEB.size() );
         //  Supposedly allows parser to re-write its output
         //CommonTokenStream tokens = new TokenRewriteStream(lexer);
         CommonTokenStream tokens = new CommonTokenStream( lexer );
+         //Lexer has created the Token Stream
+        System.out.println( "The lexer has created the TokenStream." );
+        myOutput.println( "The lexer has created the TokenStream." );
         aPlusParser parser = new aPlusParser( tokens ); 
         parser.setBuildParseTree( true );
 		
@@ -280,6 +699,14 @@ System.out.println( "Transtable size: "+ink2UEB.size() );
            //System.out.println( wrap( x, 40) );
            //System.out.println( wrap( tree.toStringTree( parser)), 40 );
          }
+        myOutput.println( "     PARSE TREE: ");
+        //myOutput.println( 
+	                 //tree.toStringTree( parser ));
+        myOutput.println( "  (repeated but wrapped) " );
+        String tmpTree = tree.toStringTree( parser );
+        //myOutput.printAsIs( wrap( tmpTree, 40 ), myOutput );
+        wrap( tmpTree, 60, myOutput );
+
 
     //System.out.println( "(text\n "+" (line\n "+"  (item\n " );
     // Optionally print tree in text form
@@ -296,8 +723,8 @@ System.out.println( "Transtable size: "+ink2UEB.size() );
           //KeepTrack kt = new KeepTrack( capInfo, uncontracted, 0 );
           //kt.makeTables( false, false );
            //Back translator, i.e. annotator, must extend baseListener 
-          BasicTranslator trans = new BasicTranslator( );
-          trans.makeTable();
+          BasicTranslator trans = new BasicTranslator( tokens );
+          //trans.makeTable();
           //KeepTrack2 kt2 = new KeepTrack2( bt );
           //BackPR.setRuleNames();
      
@@ -311,5 +738,45 @@ System.out.println( "Transtable size: "+ink2UEB.size() );
      //System.out.println(" Translated braille from annotated tree: ");
      //System.out.println( bt.getBrl( tree ) );
 
+     myOutput.finish();
+
  }//End Main.
+private static final String linebreak = "\n"; // or "\r\n";
+
+  //Found on stack (lost link, thanks whoever!)
+public static String wrap(String string, int lineLength, Tape6 myOutput) {
+    StringBuilder b = new StringBuilder();
+    for (String line : string.split(Pattern.quote(linebreak))) {
+        b.append(wrapLine(line, lineLength, myOutput));
+    }
+    return b.toString();
+}
+
+private static String wrapLine(String line, int lineLength,
+   Tape6 myOutput ) {
+    if (line.length() == 0) return linebreak;
+    if (line.length() <= lineLength) return line + linebreak;
+    String[] words = line.split(" ");
+    StringBuilder allLines = new StringBuilder();
+    StringBuilder trimmedLine = new StringBuilder();
+    for (String word : words) {
+        if (trimmedLine.length() + 1 + word.length() <= lineLength) {
+            trimmedLine.append(word).append(" ");
+        } else {
+            if (trimmedLine.toString().startsWith( "(item" )){
+              trimmedLine = trimmedLine.insert( 0, " " );
+            }
+            myOutput.println( trimmedLine.toString() );
+            allLines.append(trimmedLine).append(linebreak);
+            trimmedLine = new StringBuilder();
+            trimmedLine.append(word).append(" ");
+        }
+    }
+    if (trimmedLine.length() > 0) {
+        myOutput.println( trimmedLine.toString() );
+        allLines.append(trimmedLine);
+    }
+    allLines.append(linebreak);
+    return allLines.toString();
+}
 }//End Class BasicTranslator.
