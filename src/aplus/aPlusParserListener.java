@@ -28,6 +28,26 @@ public interface aPlusParserListener extends ParseTreeListener {
 	 */
 	void exitLine(aPlusParser.LineContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link aPlusParser#psymseq}.
+	 * @param ctx the parse tree
+	 */
+	void enterPsymseq(aPlusParser.PsymseqContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link aPlusParser#psymseq}.
+	 * @param ctx the parse tree
+	 */
+	void exitPsymseq(aPlusParser.PsymseqContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link aPlusParser#psymseq_uc}.
+	 * @param ctx the parse tree
+	 */
+	void enterPsymseq_uc(aPlusParser.Psymseq_ucContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link aPlusParser#psymseq_uc}.
+	 * @param ctx the parse tree
+	 */
+	void exitPsymseq_uc(aPlusParser.Psymseq_ucContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link aPlusParser#symseq}.
 	 * @param ctx the parse tree
 	 */
@@ -38,75 +58,15 @@ public interface aPlusParserListener extends ParseTreeListener {
 	 */
 	void exitSymseq(aPlusParser.SymseqContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link aPlusParser#startMML}.
+	 * Enter a parse tree produced by {@link aPlusParser#symseq_uc}.
 	 * @param ctx the parse tree
 	 */
-	void enterStartMML(aPlusParser.StartMMLContext ctx);
+	void enterSymseq_uc(aPlusParser.Symseq_ucContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link aPlusParser#startMML}.
+	 * Exit a parse tree produced by {@link aPlusParser#symseq_uc}.
 	 * @param ctx the parse tree
 	 */
-	void exitStartMML(aPlusParser.StartMMLContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link aPlusParser#endMML}.
-	 * @param ctx the parse tree
-	 */
-	void enterEndMML(aPlusParser.EndMMLContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link aPlusParser#endMML}.
-	 * @param ctx the parse tree
-	 */
-	void exitEndMML(aPlusParser.EndMMLContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link aPlusParser#mmlInt}.
-	 * @param ctx the parse tree
-	 */
-	void enterMmlInt(aPlusParser.MmlIntContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link aPlusParser#mmlInt}.
-	 * @param ctx the parse tree
-	 */
-	void exitMmlInt(aPlusParser.MmlIntContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link aPlusParser#mmlOp}.
-	 * @param ctx the parse tree
-	 */
-	void enterMmlOp(aPlusParser.MmlOpContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link aPlusParser#mmlOp}.
-	 * @param ctx the parse tree
-	 */
-	void exitMmlOp(aPlusParser.MmlOpContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link aPlusParser#mmlId}.
-	 * @param ctx the parse tree
-	 */
-	void enterMmlId(aPlusParser.MmlIdContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link aPlusParser#mmlId}.
-	 * @param ctx the parse tree
-	 */
-	void exitMmlId(aPlusParser.MmlIdContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link aPlusParser#mmlExpr}.
-	 * @param ctx the parse tree
-	 */
-	void enterMmlExpr(aPlusParser.MmlExprContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link aPlusParser#mmlExpr}.
-	 * @param ctx the parse tree
-	 */
-	void exitMmlExpr(aPlusParser.MmlExprContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link aPlusParser#mmlRow}.
-	 * @param ctx the parse tree
-	 */
-	void enterMmlRow(aPlusParser.MmlRowContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link aPlusParser#mmlRow}.
-	 * @param ctx the parse tree
-	 */
-	void exitMmlRow(aPlusParser.MmlRowContext ctx);
+	void exitSymseq_uc(aPlusParser.Symseq_ucContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link aPlusParser#alphaseq}.
 	 * @param ctx the parse tree
@@ -117,6 +77,16 @@ public interface aPlusParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitAlphaseq(aPlusParser.AlphaseqContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link aPlusParser#uc_seq}.
+	 * @param ctx the parse tree
+	 */
+	void enterUc_seq(aPlusParser.Uc_seqContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link aPlusParser#uc_seq}.
+	 * @param ctx the parse tree
+	 */
+	void exitUc_seq(aPlusParser.Uc_seqContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link aPlusParser#letterseq}.
 	 * @param ctx the parse tree
@@ -138,6 +108,16 @@ public interface aPlusParserListener extends ParseTreeListener {
 	 */
 	void exitConword(aPlusParser.ConwordContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link aPlusParser#conwordUC}.
+	 * @param ctx the parse tree
+	 */
+	void enterConwordUC(aPlusParser.ConwordUCContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link aPlusParser#conwordUC}.
+	 * @param ctx the parse tree
+	 */
+	void exitConwordUC(aPlusParser.ConwordUCContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link aPlusParser#space}.
 	 * @param ctx the parse tree
 	 */
@@ -158,6 +138,16 @@ public interface aPlusParserListener extends ParseTreeListener {
 	 */
 	void exitSeparator(aPlusParser.SeparatorContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link aPlusParser#freq_uc}.
+	 * @param ctx the parse tree
+	 */
+	void enterFreq_uc(aPlusParser.Freq_ucContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link aPlusParser#freq_uc}.
+	 * @param ctx the parse tree
+	 */
+	void exitFreq_uc(aPlusParser.Freq_ucContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link aPlusParser#freqword}.
 	 * @param ctx the parse tree
 	 */
@@ -167,26 +157,6 @@ public interface aPlusParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFreqword(aPlusParser.FreqwordContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link aPlusParser#itsStart}.
-	 * @param ctx the parse tree
-	 */
-	void enterItsStart(aPlusParser.ItsStartContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link aPlusParser#itsStart}.
-	 * @param ctx the parse tree
-	 */
-	void exitItsStart(aPlusParser.ItsStartContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link aPlusParser#itsEnd}.
-	 * @param ctx the parse tree
-	 */
-	void enterItsEnd(aPlusParser.ItsEndContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link aPlusParser#itsEnd}.
-	 * @param ctx the parse tree
-	 */
-	void exitItsEnd(aPlusParser.ItsEndContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link aPlusParser#small}.
 	 * @param ctx the parse tree
@@ -228,6 +198,16 @@ public interface aPlusParserListener extends ParseTreeListener {
 	 */
 	void exitTc_word(aPlusParser.Tc_wordContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link aPlusParser#uc_word}.
+	 * @param ctx the parse tree
+	 */
+	void enterUc_word(aPlusParser.Uc_wordContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link aPlusParser#uc_word}.
+	 * @param ctx the parse tree
+	 */
+	void exitUc_word(aPlusParser.Uc_wordContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link aPlusParser#startconword}.
 	 * @param ctx the parse tree
 	 */
@@ -237,6 +217,16 @@ public interface aPlusParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitStartconword(aPlusParser.StartconwordContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link aPlusParser#startconWordUC}.
+	 * @param ctx the parse tree
+	 */
+	void enterStartconWordUC(aPlusParser.StartconWordUCContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link aPlusParser#startconWordUC}.
+	 * @param ctx the parse tree
+	 */
+	void exitStartconWordUC(aPlusParser.StartconWordUCContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link aPlusParser#midconword}.
 	 * @param ctx the parse tree
@@ -248,6 +238,16 @@ public interface aPlusParserListener extends ParseTreeListener {
 	 */
 	void exitMidconword(aPlusParser.MidconwordContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link aPlusParser#midconworduc}.
+	 * @param ctx the parse tree
+	 */
+	void enterMidconworduc(aPlusParser.MidconworducContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link aPlusParser#midconworduc}.
+	 * @param ctx the parse tree
+	 */
+	void exitMidconworduc(aPlusParser.MidconworducContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link aPlusParser#midendconword}.
 	 * @param ctx the parse tree
 	 */
@@ -257,6 +257,16 @@ public interface aPlusParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitMidendconword(aPlusParser.MidendconwordContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link aPlusParser#midendconworduc}.
+	 * @param ctx the parse tree
+	 */
+	void enterMidendconworduc(aPlusParser.MidendconworducContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link aPlusParser#midendconworduc}.
+	 * @param ctx the parse tree
+	 */
+	void exitMidendconworduc(aPlusParser.MidendconworducContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link aPlusParser#period}.
 	 * @param ctx the parse tree
@@ -308,16 +318,6 @@ public interface aPlusParserListener extends ParseTreeListener {
 	 */
 	void exitNot_lc(aPlusParser.Not_lcContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link aPlusParser#garbage}.
-	 * @param ctx the parse tree
-	 */
-	void enterGarbage(aPlusParser.GarbageContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link aPlusParser#garbage}.
-	 * @param ctx the parse tree
-	 */
-	void exitGarbage(aPlusParser.GarbageContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link aPlusParser#uc_let}.
 	 * @param ctx the parse tree
 	 */
@@ -327,16 +327,6 @@ public interface aPlusParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitUc_let(aPlusParser.Uc_letContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link aPlusParser#uc_seq}.
-	 * @param ctx the parse tree
-	 */
-	void enterUc_seq(aPlusParser.Uc_seqContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link aPlusParser#uc_seq}.
-	 * @param ctx the parse tree
-	 */
-	void exitUc_seq(aPlusParser.Uc_seqContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link aPlusParser#begCon}.
 	 * @param ctx the parse tree
@@ -357,6 +347,16 @@ public interface aPlusParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitMidCon(aPlusParser.MidConContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link aPlusParser#midConUC}.
+	 * @param ctx the parse tree
+	 */
+	void enterMidConUC(aPlusParser.MidConUCContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link aPlusParser#midConUC}.
+	 * @param ctx the parse tree
+	 */
+	void exitMidConUC(aPlusParser.MidConUCContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link aPlusParser#begConTC}.
 	 * @param ctx the parse tree
@@ -388,6 +388,16 @@ public interface aPlusParserListener extends ParseTreeListener {
 	 */
 	void exitAnywhereCon(aPlusParser.AnywhereConContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link aPlusParser#anywhereConUC}.
+	 * @param ctx the parse tree
+	 */
+	void enterAnywhereConUC(aPlusParser.AnywhereConUCContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link aPlusParser#anywhereConUC}.
+	 * @param ctx the parse tree
+	 */
+	void exitAnywhereConUC(aPlusParser.AnywhereConUCContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link aPlusParser#midEndCon}.
 	 * @param ctx the parse tree
 	 */
@@ -397,6 +407,16 @@ public interface aPlusParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitMidEndCon(aPlusParser.MidEndConContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link aPlusParser#midEndConUC}.
+	 * @param ctx the parse tree
+	 */
+	void enterMidEndConUC(aPlusParser.MidEndConUCContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link aPlusParser#midEndConUC}.
+	 * @param ctx the parse tree
+	 */
+	void exitMidEndConUC(aPlusParser.MidEndConUCContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link aPlusParser#startNum}.
 	 * @param ctx the parse tree

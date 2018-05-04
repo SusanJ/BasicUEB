@@ -229,26 +229,38 @@ ink2UEB.put( "With", ",)" );
   //checks by context
 ink2UEB.put( "but", "b" );
 ink2UEB.put( "But", ",b" );
+ink2UEB.put( "BUT", "b" );
 ink2UEB.put( "can", "c" );
 ink2UEB.put( "Can", ",c" );
-ink2UEB.put( "do", "d" );
-ink2UEB.put( "Do", ",d" );
+ink2UEB.put( "CAN", "c" );
+ink2UEB.put( "do",  "d" );
+ink2UEB.put( "Do",  ",d" );
+ink2UEB.put( "DO",  "d" );
 ink2UEB.put( "every", "e" );
 ink2UEB.put( "Every", ",e" );
+ink2UEB.put( "EVERY", ",e" );
 ink2UEB.put( "from", "f" );
 ink2UEB.put( "From", ",f" );
+ink2UEB.put( "FROM", ",f" );
 ink2UEB.put( "go", "g" );
 ink2UEB.put( "Go", ",g" );
+ink2UEB.put( "GO", "g" );
 ink2UEB.put( "have", "h" );
 ink2UEB.put( "Have", ",h" );
+ink2UEB.put( "HAVE", "h" );
 ink2UEB.put( "just", "j" );
 ink2UEB.put( "Just", ",j" );
+ink2UEB.put( "JUST", "j" );
 ink2UEB.put( "knowledge", "k" );
 ink2UEB.put( "Knowledge", ",k" );
+ink2UEB.put( "KNOWLEDGE", "k" );
 ink2UEB.put( "like", "l" );
 ink2UEB.put( "Like", ",l" );
+ink2UEB.put( "LIKE", "l" );
 ink2UEB.put( "more", "m" );
 ink2UEB.put( "More", ",m" );
+ink2UEB.put( "More", "m" );
+
 ink2UEB.put( "not", "not" );
 ink2UEB.put( "Not", ",not" );
 ink2UEB.put( "people", "p" );
@@ -265,14 +277,20 @@ ink2UEB.put( "us", "u" );
 ink2UEB.put( "Us", ",u" );
 ink2UEB.put( "very", "v" );
 ink2UEB.put( "Very", ",v" );
+
 ink2UEB.put( "will", "w" );
 ink2UEB.put( "Will", ",w" );
+ink2UEB.put( "WILL", "w" );
 ink2UEB.put( "it", "x" );
 ink2UEB.put( "It", ",x" );
+ink2UEB.put( "IT", "x" );
 ink2UEB.put( "you", "y" );
 ink2UEB.put( "You", ",y" );
+ink2UEB.put( "YOU", "y" );
 ink2UEB.put( "as", "z" );
 ink2UEB.put( "As", ",z" );
+ink2UEB.put( "AS", "z" );
+
 
 
   //Same sequences as alphabetic words but how they
@@ -554,6 +572,7 @@ public static String getTcPreTrans( String word,
   };
  return getPreTrans( word );
  }
+
  //Checks for alphabetic sequence
  //Tree walker knows this somehow also....
 public static boolean alphabetic( String word ){
@@ -562,5 +581,18 @@ public static boolean alphabetic( String word ){
    if (!alpha) return false;
   }
  return true;
+}
+
+ //Returns false if input contains a lowercase letter;
+ // otherwise returns true. Cf. Rulebook Sec. 8.5.
+public static boolean okInCapsPassage( String ink ){
+ for (int i=0; i<ink.length(); i++){
+  if ( Character.isLetter( ink.charAt( i ) ) ){
+   if ( Character.isLowerCase( ink.charAt( i ) ) ){
+     return false;
+   }
+  } // UpperCase letter allowed
+ } //Non-alphabetic character allowed
+  return true;
 }
 }//End Class EasyTrans.

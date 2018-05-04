@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
+import java.util.Stack;
 
 //import org.dotlessbraille.utilities.Tape5;
 
@@ -52,6 +53,13 @@ import java.util.regex.Pattern;
   boolean debug = false;
   boolean testVOCAB = false;
   BufferedTokenStream allTokens;
+  int currentLineNumber = 0;
+  int lineCapsPassageStarts = 0;
+
+  ParseTree  firstInPassage;  //Potential start of caps passage
+  ParseTree pendingLastInPassage;
+  Stack <ParseTree> capsPass = new Stack <ParseTree>();
+  int capseqCnt = 0;
 
   BasicTranslator( BufferedTokenStream allTokens ){
    this.VOCABULARY= aPlusParser.VOCABULARY;
@@ -73,14 +81,22 @@ import java.util.regex.Pattern;
    return ueb.get( ctx );
   }
 //====================================================
-
+@Override 
+ public void enterText(aPlusParser.TextContext ctx) { }
+@Override
+ public void exitText(aPlusParser.TextContext ctx) { }
+@Override 
+  public void enterLine( aPlusParser.LineContext ctx){
+   currentLineNumber = currentLineNumber + 1;
+} 
 @Override 
   public void exitLine( aPlusParser.LineContext ctx){
 
     System.out.println( "\n Line input: " + ctx.getText());
     //System.out.println( ctx.getText() );
     int cnt = ctx.getChildCount();
-    System.out.println( "Line has: "+cnt+" child nodes." );
+    System.out.println( "Line "+currentLineNumber+
+     " has: "+cnt+" child nodes." );
     String ink;
     String brl;
     StringBuilder buf = new StringBuilder();;
@@ -110,13 +126,120 @@ import java.util.regex.Pattern;
     System.out.println( "Input: "+noNL
                        +" UEB: "+ buf.toString());
 }
+
+@Override 
+public void enterPsymseq(aPlusParser.PsymseqContext ctx) {
+ //Parent of symseq with optional pre/post punc
+}
+@Override 
+ public void exitPsymseq(aPlusParser.PsymseqContext ctx) { 
+    //Parent of symseq with optional pre/post punc
+    //TO-DO  Check any pre/post punc for standing alone rule and
+    // adjust symseq child result if necessary
+
+ System.out.println( "exitPsymseq" );
+ int cnt = ctx.getChildCount();
+ StringBuilder buf = new StringBuilder();
+ for (int i=0; i<cnt; i++ ){
+  buf.append( getUEB( ctx.getChild( i ) ) );
+ }
+ setUEB( ctx, buf.toString() );
+}
+
+@Override
+ public void enterPsymseq_uc(aPlusParser.Psymseq_ucContext ctx) {
+   //Parent of symseq-uc with optional pre/post punc
+ }
+	
+@Override
+ public void exitPsymseq_uc(aPlusParser.Psymseq_ucContext ctx) { 
+    //Parent of symseq_uc with optional pre/post punc
+    //TO-DO  Check any pre/post punc for standing alone rule 
+    // context and adjust symseq child result if necessary
+
+ System.out.println( "exitPsymseq_uc" );
+ int cnt = ctx.getChildCount();
+ StringBuilder buf = new StringBuilder();
+ for (int i=0; i<cnt; i++ ){
+  buf.append( getUEB( ctx.getChild( i ) ) );
+ }
+ setUEB( ctx, buf.toString() );
+}
+	
+@Override
+ public void enterSymseq_uc(aPlusParser.Symseq_ucContext ctx) { 
+
+  String ink = ctx.getText();
+  if (debug){
+   System.out.println( "\n   enterSymseq_uc--input: "+ink );
+  }
+  capseqCnt = capseqCnt + 1;
+  if (capseqCnt == 1){
+   firstInPassage = ctx; //Possible start of a caps passage
+  }
+  System.out.println( " enterSymseq_uc --Count caps pass ok : "
+         + capseqCnt );
+  String brl = EasyTrans.getPreTrans( ink );
+  if (brl != null){
+   skipLeafierNodes = true;
+   setUEB( ctx, brl );
+   System.out.println( "ess_uc brl "+brl );   
+  }
+  capsPass.push( ctx );
+ }
+	
+@Override public void exitSymseq_uc(aPlusParser.Symseq_ucContext ctx) {
+  boolean capsPassage = false;
+  if (capseqCnt > 2) {
+   capsPassage = true;
+   pendingLastInPassage = ctx;
+  }
+  
+  System.out.println( "exitSymseq_uc--CAPS PASSAGE: "+capsPassage ); 
+  if (skipLeafierNodes){
+
+     //First guy gets caps passage but doesn't know yet!!!!
+     //Last guy get caps term
+     //Prepend caps word or caps passage indicator
+     //THIS IS TOO CUTE!
+   StringBuilder buf;
+   if (!capsPassage){
+     buf = new StringBuilder( ",," ); //Explicit term?
+     buf.append( getUEB( ctx ) );
+     setUEB( ctx, buf.toString() );
+   } else {
+     buf = new StringBuilder( ",,,");
+     buf.append( getUEB( firstInPassage ) );
+     setUEB( firstInPassage, buf.toString() );
+   }
+   System.out.println( "\n   exitSymseq_uc--Input: "+ctx.getText()
+              +" UEB: "+ getUEB( ctx ) );
+   myOutput.println( "\n   exitSymseq_uc--Input: "+ctx.getText()
+              +" UEB: "+ getUEB( ctx) );
+   skipLeafierNodes = false;
+   return;
+  }
+  
+ }
+
+
+ //Handles pretranslated lc and tc words
 @Override
   public void enterSymseq(aPlusParser.SymseqContext ctx){
   skipLeafierNodes = false;
   String ink = ctx.getText();
 
-  if (debug){
-   System.out.println( "\n   enterSymseq input: "+ink );
+  //if (debug){
+   System.out.println( "\n   enterSymseq--input: "+ink );
+  //}
+
+  if (EasyTrans.okInCapsPassage( ink )){
+   capseqCnt = capseqCnt + 1; 
+   System.out.println( " enterSymseq--Count caps pass ok : "
+                       + capseqCnt ); 
+  } else {
+   capseqCnt = 0;
+   System.out.println( "capsSeqCnt: "+capseqCnt );
   }
 
   boolean titleCase = false;
@@ -127,6 +250,7 @@ import java.util.regex.Pattern;
    //Second pass to find pre-translated words
 
   //if (ink.length() > 1){
+/**
    char beg  = ink.charAt( 0 );
    boolean up = Character.isUpperCase( beg );
    if (up){
@@ -137,9 +261,10 @@ import java.util.regex.Pattern;
    if (debug){
     System.out.println( "Is input titlecase? "+titleCase );
    }
+*/
   //};
 
-boolean testVOCAB = true;
+boolean testVOCAB = false;
 if (testVOCAB){
     Token myFirst = ctx.getStart();
     int tokenb = myFirst.getTokenIndex();
@@ -166,28 +291,36 @@ if (testVOCAB){
   //If input is title case check as lower case and if that
   //matches prepend dot6  ASSUMPTION 
 
-  if (titleCase){
-    brl = EasyTrans.getPreTrans( ink.toLowerCase() );
-    if (brl != null) {
-     brl = ","+brl;
-        if (debug){
-         System.out.println( "enterSymseq brl: "+brl );}
-     setUEB( ctx, brl );
-     skipLeafierNodes = true;
-    }
+
+  System.out.println( "Enter symSeq -- looking for Pretrans" );
+  brl = EasyTrans.getTcPreTrans( ink, "," );
+  if (brl != null){
+    setUEB( ctx, brl ); 
+    skipLeafierNodes = true;                    
+  //if (titleCase){
+    //brl = EasyTrans.getPreTrans( ink.toLowerCase() );
+    //if (brl != null) {
+    // brl = ","+brl;
+        //if (debug){
+         //System.out.println( "enterSymseq brl: "+brl );}
+     //setUEB( ctx, brl );
+     //skipLeafierNodes = true;
+    //}
+    System.out.println( "ess brl1 "+brl );
   } else {  //Not titleCase
     //This is NOT always appropriate, what if it is a number? 
     //Only if alphabetic!!!!  
     brl = EasyTrans.getPreTrans( ink );
     if (brl != null){
-       if (debug){
+       //if (debug){
         System.out.println( "enterSymseq brl: "+brl );
-       }
+       //}
      setUEB( ctx, brl );
-     skipLeafierNodes = true;    
+     skipLeafierNodes = true; 
+     System.out.println( "ess brl2 "+brl );   
     }
    }
- }//End eEnterSymseq().
+ }//End enterSymseq().
 
 @Override
   public void exitSymseq(aPlusParser.SymseqContext ctx){
@@ -203,6 +336,9 @@ if (testVOCAB){
          ) punc*;
   alphabetic word: 
 */
+
+ System.out.println( "exitSymSeq -- skipLowerNodes: "+
+       skipLeafierNodes );
     //Cases where a whole-word pretranslation was available
   if (skipLeafierNodes){
    System.out.println( "\n   exitSymseq--Input: "+ctx.getText()
@@ -214,7 +350,7 @@ if (testVOCAB){
   }
 
   //if (debug)
-  System.out.println( "Starting to finish symbol seq input: "+
+  System.out.println( "exitSymSeqStarting to finish symbol seq input: "+
                        ctx.getText() );
     
     int cnt = ctx.getChildCount();
@@ -518,7 +654,8 @@ public void exitMidCon(aPlusParser.MidConContext ctx) {
  }
 
    //'Garbage' is random sequences that were't otherwise recognized
-@Override
+//@Override
+/**
  public void exitGarbage(aPlusParser.GarbageContext ctx) { 
    String brl;
    StringBuilder buf = new StringBuilder();
@@ -529,6 +666,7 @@ public void exitMidCon(aPlusParser.MidConContext ctx) {
    System.out.println( "   In exitGarbage--output "+ buf.toString() );
    setUEB( ctx, buf.toString() ) ;
 }
+*/
      //UEB Upper Numbers
 
   //Not lc handles all sequence w/o small letters but typically

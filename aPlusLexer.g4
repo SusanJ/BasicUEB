@@ -2,47 +2,107 @@ lexer grammar aPlusLexer;
 @lexer::header{ package aplus; }
 @lexer::members{ public static boolean lastSep = false;}
 
+/*  Parsing as the first step in converting print to
+   literary braille. All 94 ASCII characters plus
+   a few non-ASCII characters are identifed as tokens by
+   the lexer. Additional
+   tokens are letter sequences that correspond 
+   to many of those braille contractions 
+   that can represent entire
+   words as well as parts of words. 
+
+    The parser has no knowledge of the special whole
+   word contractions, i.e. single-letter whole
+   word contractions and shortforms, that apply only
+   to whole words and only then in certain 
+   contexts.  Words that should use these contractions
+   are identified during the annotating process
+   and their correct braille translations are
+   supplied.
+
+    The parser grammar uses the tokens corresponding
+   to braille contractions to contract words
+   according to the default UEB rules; it has no knowledge
+   of exceptions.  Exceptions are identified 
+   during the annotating process and their correct
+   braille translations are supplied from an explicit
+   exceptions table which includes so-called 
+   "problem words" and the 529 words specified
+   by UEBC as those permitted to use shortforms as 
+   part-word contractions. (Since the parser is
+   unaware of shortforms, any words that could
+   potentially use shortforms as part-word
+   contractions but aren't among the 529
+   will have been contracted appropriately
+   by the parser.)
+*/
+
+//APLUSstag: '<aplus>' -> pushMode( APLUS );
+
+//mode APLUS;
+//END_APLUS: '</aplus>' -> popMode;
 
 
-//Markdown support?
- //fragment ASTER: '*';
-//ITAL: ASTER; //1
-//BOLD: ASTER ASTER;
-//fragment START_I: '<''i''>';
-//fragment END_I:   '<''/''i''>';
+ //  Individual digits simplifies dealing with
+ //  numeric indicators that are also symbols (10)
 
+ZERO        :   '0';
+ONE         :   '1';
+TWO         :   '2';
+THREE       :   '3';
+FOUR        :   '4';
+FIVE        :   '5';
+SIX         :   '6';
+SEVEN       :   '7';
+EIGHT       :   '8';
+NINE        :   '9';
 
-ZERO:  '0';
-ONE:   '1';
-TWO:   '2';
-THREE: '3';
-FOUR:  '4';
-FIVE:  '5';
-SIX:   '6';
-SEVEN: '7';
-EIGHT: '8';
-NINE:  '9';
+OFENCE      : ( '('
+            |   '['
+            |   '{'
+            |   '<'
+               )   {lastSep = true;}; // (4)
+    
+CFENCE      :   ')'
+            |   ']'
+            |   '}'
+            |   '>'
+            ;        // (4)
 
-OFENCE: '('|'['|'{'|'<'{lastSep = true;}; //3
-CFENCE: ')'|']'|'}'|'>'; //3
-NEU:  '\''|'"'; //2
-PERIODorDEC:  '.'; //1
-SEMICOLON: ';';
-PUNC: ','|'?'|':'|'!'; //5
-SPEC: '\\'|'|'|'+'|'='|'&'|'*'
-      '^'|'%'|'$'|'#'|'@'|'~'; //12
-FSLASH:'/';
+NEU         :   '\''
+            |   '"'
+            ;         // (2)
+PERIODorDEC :   '.';  // (1)
+SEMICOLON   :   ';';  // (1)
+PUNC        :   ','
+            |   '?'
+            |   ':'
+            |   '!'
+            ;        // (4)
 
-BACK_TICK: '`'; //1
-SEP: ('-'|'_') {lastSep = true;};  //2
+SPEC        :   '\\'
+            |   '|'
+            |   '+'
+            |   '='
+            |   '&'
+            |   '*'
+            |   '^'
+            |   '%'
+            |   '$'
+            |   '#'
+            |   '@'
+            |   '~'
+            ;      // (12)
 
+FSLASH      :   '/';      // (1)
+BACK_TICK   :   '`';      // (1)
+HYP         :   '-' {lastSep = true;}; // (1)
+USCORE      :   '_' {lastSep = true;}; // (1)
 
-
-//STRONG:    'child'|'which'|'shall'|'this'|'out'|'still';
-//STRONG_TC: 'Child'|'Which'|'Shall'|'This'|'Out'|'Still';
 
 WEIRD:    'his'|'was'|'were'|'enough';
 WEIRD_TC: 'His'|'Was'|'Were'|'Enough';
+WEIRD_UC: 'HIS'|'WAS'|'WERE'|'ENOUGH';
 
 
    //  Symbols used as either words or contractions
@@ -58,179 +118,142 @@ WEIRD_TC: 'His'|'Was'|'Were'|'Enough';
 
 LARGE:    ('and'|'for'|'of'|'the'|'with') {lastSep = false;};
 LARGE_TC: ('And'|'For'|'Of'|'The'|'With') {lastSep = false;};
+LARGE_UC: ('AND'|'FOR'|'OF'|'THE'|'WITH') {lastSep = false;};
 
-ILC45:    ('upon'|'these'|'those'|'whose'|'word') {lastSep = false;};
-ILC45_TC: ('Upon'|'These'|'Those'|'Whose'|'Word') {lastSep = false;};
+ILC45:     ('upon'|'these'|'those'|
+            'whose'|'word')
+           {lastSep = false;};
+ILC45_TC:  ('Upon'|'These'|'Those'|
+            'Whose'|'Word') 
+           {lastSep = false;};
+ILC45_UC:  ('UPON'|'THESE'|'THOSE'|
+            'WHOSE'|'WORD') 
+           {lastSep = false;};
 
-ILC456: 'cannot'|'had'|'many'|'spirit'|'their'|'world';
-ILC456_TC: 'Cannot'|'Had'|'Many'|'Spirit'|'Their'|'World';
+ILC456:    ('cannot'|'had'|'many'|'spirit'|'their'|'world') {lastSep = false;};
+ILC456_TC: ('Cannot'|'Had'|'Many'|'Spirit'|'Their'|'World') {lastSep = false;};
+ILC456_UC: ('CANNOT'|'HAD'|'MANY'|'SPIRIT'|'THEIR'|'WORLD') {lastSep = false;};
 
-ILC5:    ('day'|'ever'|'father'|'here'|'know'|'lord'|'mother'|
-         'name'|'one'|'part'|'question'|'right'|'some'|
-         'time'|'under'|'young'|'there'|
-         'character'|'through'|'where'|'ought'|'work'){lastSep = false;};
-ILC5_TC: ('Day'|'Ever'|'Father'|'Here'|'Know'|'Lord'|'Mother'|
-      'Name'|'One'|'Part'|'Question'|'Right'|'Some'|
-      'Time'|'Under'|'Young'|'There'|                          
-      'Character'|'Through'|'Where'|'Ought'|'Work'){lastSep = false;};
+ILC5:      ('day'|'ever'|'father'|'here'|'know'|'lord'|'mother'|
+            'name'|'one'|'part'|'question'|'right'|'some'|
+            'time'|'under'|'young'|'there'|
+            'character'|'through'|'where'|'ought'|'work'
+           ){lastSep = false;};
+ILC5_TC:   ('Day'|'Ever'|'Father'|'Here'|'Know'|'Lord'|'Mother'|
+            'Name'|'One'|'Part'|'Question'|'Right'|'Some'|
+            'Time'|'Under'|'Young'|'There'|                          
+            'Character'|'Through'|'Where'|'Ought'|'Work'
+           ){lastSep = false;};
+ILC5_UC:   ('DAY'|'EVER'|'FATHER'|'HERE'|'KNOW'|'LORD'|'MOTHER'|
+            'NAME'|'ONE'|'PART'|'QUESTION'|'RIGHT'|'SOME'|
+            'TIME'|'UNDER'|'YOUNG'|'THERE'|                          
+            'CHARACTER'|'THROUGH'|'WHERE'|'OUGHT'|'WORK'
+           ){lastSep = false;};
 
-  //  Need to have individual letters as lexer tokens since parser
-  // has to use them to define position-dependent contractions
-LETTERA: 'a'{lastSep = false;};
-LETTERB: 'b'{lastSep = false;};
-LETTERC: 'c'{lastSep = false;};
-LETTERD: 'd'{lastSep = false;};
-LETTERE: 'e'{lastSep = false;};
-LETTERF: 'f'{lastSep = false;};
-LETTERG: 'g'{lastSep = false;};
-LETTERH: 'h'{lastSep = false;};
-LETTERI: 'i'{lastSep = false;};
-LETTERJ: 'j'{lastSep = false;};
-LETTERK: 'k'{lastSep = false;};
-LETTERL: 'l'{lastSep = false;};
-LETTERM: 'm'{lastSep = false;};
-LETTERN: 'n'{lastSep = false;};
-LETTERO: 'o'{lastSep = false;};
-LETTERP: 'p'{lastSep = false;};
-LETTERQ: 'q'{lastSep = false;};
-LETTERR: 'r'{lastSep = false;};
-LETTERS: 's'{lastSep = false;};
-LETTERT: 't'{lastSep = false;};
-LETTERU: 'u'{lastSep = false;};
-LETTERV: 'v'{lastSep = false;};
-LETTERW: 'w'{lastSep = false;};
-LETTERX: 'x'{lastSep = false;};
-LETTERY: 'y'{lastSep = false;};
-LETTERZ: 'z'{lastSep = false;};
+/*     Need to use individual letters as named
+      lexer tokens since the parser needs
+      them to define position-dependent braille
+      contractions that can't be used as
+      lexer tokens
+*/
+LETTERA   : 'a' {lastSep = false;};
+LETTERB   : 'b' {lastSep = false;};
+LETTERC   : 'c' {lastSep = false;};
+LETTERD   : 'd' {lastSep = false;};
+LETTERE   : 'e' {lastSep = false;};
+LETTERF   : 'f' {lastSep = false;};
+LETTERG   : 'g' {lastSep = false;};
+LETTERH   : 'h' {lastSep = false;};
+LETTERI   : 'i' {lastSep = false;};
+LETTERJ   : 'j' {lastSep = false;};
+LETTERK   : 'k' {lastSep = false;};
+LETTERL   : 'l' {lastSep = false;};
+LETTERM   : 'm' {lastSep = false;};
+LETTERN   : 'n' {lastSep = false;};
+LETTERO   : 'o' {lastSep = false;};
+LETTERP   : 'p' {lastSep = false;};
+LETTERQ   : 'q' {lastSep = false;};
+LETTERR   : 'r' {lastSep = false;};
+LETTERS   : 's' {lastSep = false;};
+LETTERT   : 't' {lastSep = false;};
+LETTERU   : 'u' {lastSep = false;};
+LETTERV   : 'v' {lastSep = false;};
+LETTERW   : 'w' {lastSep = false;};
+LETTERX   : 'x' {lastSep = false;};
+LETTERY   : 'y' {lastSep = false;};
+LETTERZ   : 'z' {lastSep = false;};
 
+CAPS      :  [A-Z] {lastSep = false;};
 
-
-//SMALL: [f-z]{lastSep = false;};
-//IT_SMALL: START_I SMALL END_I;
-CAPS: [A-Z]{lastSep = false;};
-//START_IT: START_I;
-//END_IT: START_I;
-
-//LESS_THAN: '<'; //1
-//GRTR_THAN: '>'; //1
-
-//BE: 'be';
 BE_TC: 'Be';
-IN: 'in';
-IN_TC: 'In';
-EN: 'en';
-EN_TC: 'En';
+
+EN      : 'en';
+EN_TC   : 'En';
+EN_UC   : 'EN';
+IN      : 'in';
+IN_TC   : 'In';
+IN_UC   : 'IN';
+
 
       //  Symbols supposedly used only as contractions but
-      // anywhere in a word.  They can be a problem
+      // anywhere in a word.  They MIGHT be a problem
       // when they can also represent words including
       // Ed, sh, er, ...
-STRONG_GS:  ('ch'|'wh'|'sh'|'th'|'ou'|'st'|
-            'gh'|'ed'|'er'|'ow'|'ing'|'ar'){lastSep = false;}; 
-STRONG_GS_TC: ('Ch'|'Wh'|'Sh'|'Th'|'Ou'|'St'|
-              'Gh'|'Ed'|'Er'|'Ow'|'Ing'|'Ar'){lastSep = false;}; 
+STRONG_GS     : ('ch'|'wh'|'sh'|'th'|'ou'|'st'|
+                 'gh'|'ed'|'er'|'ow'|'ing'|'ar'){lastSep = false;}; 
+STRONG_GS_TC  : ('Ch'|'Wh'|'Sh'|'Th'|'Ou'|'St'|
+                 'Gh'|'Ed'|'Er'|'Ow'|'Ing'|'Ar'){lastSep = false;}; 
+STRONG_GS_UC  : ('CH'|'WH'|'SH'|'TH'|'OU'|'ST'|
+                 'GH'|'ED'|'ER'|'OW'|'ING'|'AR'){lastSep = false;}; 
 
    //  This rule only used when the last item was NOT a separator
    // or similar character than could signal the beginning of
    // an upcoming word.
-FLC: 
-     ('ment'|'ful'|'ong'|'ity'|'ance'|'ence'|
-     'ound'|'ount'|'less'|'ness'|'sion'|'tion')
-     {!lastSep}?
-     ;
+FLC    :   ('ment'|'ful'|'ong'|'ity'|'ance'|'ence'|
+            'ound'|'ount'|'less'|'ness'|'sion'|'tion'
+           ){!lastSep}? ;
+FLC_TC :   ('Ment'|'Ful'|'Ong'|'Ity'|'Ance'|'Ence'|
+            'Ound'|'Ount'|'Less'|'Ness'|'Sion'|'Tion'
+           ){!lastSep}? ;
+FLC_UC :   ('MENT'|'FUL'|'ONG'|'ITY'|'ANCE'|'ENCE'|
+            'OUND'|'OUNT'|'LESS'|'NESS'|'SION'|'TION'
+           ){!lastSep}? ;
 
-   //Lower groupsigns
-//BEGCON: 'be'|'con'|'dis';
-//BEGCON: 'con'|'dis';
+
+ //Move to parser?
 BEGCON_TC: 'Con'|'Dis';
-MIDCON: 'ea'|'bb'|'cc'|'ff'|'gg';
+BEGCON_UC: 'CON'|'DIS';
 
 
-        //UEB Contracted Whole Words
-//WW: 'but'|'can'|'do'|'every'|'from'|'go'|'have'|
-    //'just'|'knowledge'|'like'|'more'|
-    //'not'|'people'|'quite'|'rather'|'so'|'that'|
-    //'us'|'very'|'will'|'it'|'you'|'as'
-    //;
-//WW_TC: 'But'|'Can'|'Do'|'Every'|'From'|'Go'|'Have';
+MIDCON:    'ea'|'bb'|'cc'|'ff'|'gg';
+MIDCON_TC: 'Ea'|'Bb'|'Cc'|'Ff'|'Gg';
+MIDCON_UC: 'EA'|'BB'|'CC'|'FF'|'GG';
 
+
+    //  **Non-ASCII characters**
 
 MDASH: '—' {lastSep = true;};
 NDASH: '–' {lastSep = true;};
 
-
-  //smart odquo cdquo osquo cdquo
+    // Smart double and single quotes
 ODQUO: '“';
 CDQUO: '”';
+OSQUO: '‘';
+CSQUO: '’';
 
-ITAL_STAG: '<i>';
-//ITAL_STAG: '<''i''>';
+//Markdown support?
+//ITAL: ASTER; //1
+//BOLD: ASTER ASTER;
 
-ITAL_ETAG: '<''/''i''>';
-
-
-
+   //White space
  fragment ASPACE: ' ';     
   SPACE: ASPACE {lastSep = true;};
  fragment WINNL: [\r\n]+;
   NEWLINE: WINNL {lastSep = true;};
 
-//START_DIS: USCORE PCENT ASPACE -> pushMode( NEMETH );
+   // UEB switch to Nemeth indicator
+//START_DIS: DOTS456 DOTS146 ' ' -> pushMode( NEMETH );
 
-START_MML: '<math>' -> pushMode( MML );
-
-
-START_NEM: '<Nem>' -> pushMode( NEMETH );
-
-mode NEMETH;
-  //END_DIS: USCORE COLON ASPACE -> popMode;
-  END_NEM: '</Nem>' -> popMode;
-  NEM_NI:    '#';
-  NEM_ZERO:  '0';
-  NEM_ONE:   '1';
-  NEM_TWO:   '2';
-  NEM_THREE: '3';
-  NEM_FOUR:  '4';
-  NEM_FIVE:  '5';
-  NEM_SIX:   '6';
-  NEM_SEVEN: '7';
-  NEM_EIGHT: '8';
-  NEM_NINE:  '9';
-  
-NEM_LCletter: '[a-z]'; 
-NEM_UCletter: '[A-Z]';   
-
-mode MML;
-END_MML:   '</math>' -> popMode;
-MML_NEWLINE: WINNL;
-MML_SPACE: ASPACE;
-
-fragment MN_STAG: '<mn>';
-fragment MN_ETAG: '</mn>';
-fragment MI_STAG: '<mi>';
-fragment MI_ETAG: '</mi>';
-fragment MO_STAG: '<mo>';
-fragment MO_ETAG: '</mo>';
-
-MML_SROW:  '<mrow>';
-MML_EROW: '</mrow>';
-MML_SFRAC:  '<mfrac>';
-MML_EFRAC: '</mfrac>';
-MML_SSUB:  '<msub>';
-MML_ESUB: '</msub>';
-MML_SSUP:  '<msup>';
-MML_ESUP: '</msup>';
-MML_SSUBSUP:  '<msubsup>';
-MML_ESUBSUP: '</msubsup>';
-
-MML_DEC_DIG: [0-9];
-MML_LC_LET:  [a-z];
-
-MML_INT:  MN_STAG MML_DEC_DIG+ MN_ETAG;
-MML_VAR:  MI_STAG MML_LC_LET MI_ETAG;
-MML_OP:   MO_STAG ('+'|'-') MO_ETAG;
-MML_CMPR: MO_STAG ('='|'<'|'>') MO_ETAG;
-MML_FUNS: MO_STAG ('sin'|'cos'|'amp'|'antilog'|'arc') MO_ETAG;
 
 
 
