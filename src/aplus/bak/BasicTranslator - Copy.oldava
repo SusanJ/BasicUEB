@@ -97,9 +97,6 @@ import java.util.Stack;
  }
 @Override
  public void exitText(aPlusParser.TextContext ctx) {
-
-  // When concatenating text may need to append 
-  // passage terminators to  end of last line
  }
 @Override 
   public void enterLine( aPlusParser.LineContext ctx ){
@@ -109,27 +106,22 @@ import java.util.Stack;
 @Override 
   public void exitLine( aPlusParser.LineContext ctx){
 
-    System.out.println( "\n  exitLine--input: " + ctx.getText());
-    myOutput.println( "\n  exitLine for Line No. "+
-       currentLineNumber );
-    myOutput.println( "\n       input: " + ctx.getText());
+    System.out.println( "\n Line input: " + ctx.getText());
     //System.out.println( ctx.getText() );
     int cnt = ctx.getChildCount();
-    System.out.println( "     Line "+currentLineNumber+
+    System.out.println( "Line "+currentLineNumber+
      " has: "+cnt+" child nodes." );
     String ink;
     String brl;
     StringBuilder buf = new StringBuilder();;
 
      //Gets UEB from lower nodes where available
-     //NOTE -- skips final node!
     for (int i=0; i<cnt-1; i++){
      brl = getUEB( ctx.getChild(i) );
      ink = ctx.getChild(i).getText();
      if (brl == null){
       if (ink.equals( " ")){
         brl = ink;
-        setUEB( ctx.getChild(i), brl ); //So line can be redone
       } else {
        System.out.println( "Did not yet get trans for: |"+ink+"|");
        brl = EasyTrans.getBrl( ink );
@@ -142,21 +134,11 @@ import java.util.Stack;
     setUEB( ctx, buf.toString() );
     int inputLen = ctx.getText().length();
     System.out.println( "inputLen: "+inputLen );
-
-     //Print w/o input w/o newline.
     int last = inputLen-2;
     String noNL = ctx.getText().substring( 0, last ); 
 
-    System.out.println( "    Input: "+noNL
-                        +" UEB: "+ buf.toString());
-    myOutput.println( "    Input: "+noNL
-                        +" UEB: "+ buf.toString());
-    if (!capsPass.empty()){
-     System.out.println( "    ****WARNING EOL "+
-         "with pending caps passage." );
-     myOutput.println( "    ****WARNING EOL "+
-         "with pending caps passage." );
-    }
+    System.out.println( "Input: "+noNL
+                       +" UEB: "+ buf.toString());
 }
 
 @Override 
@@ -291,10 +273,6 @@ void handleAnyCapsPass(){
        setUEB( node, buf.toString() );
        System.out.println( "Updated: "+getUEB( node ) );
        reColl( node.getParent() );
-      if (lineCapsPassageStarts != currentLineNumber){
-       System.out.println( "WARNING -- NEED TO FIX MULTI-"+
-           "LINE CAPS PASSAGE START!" );
-     }
       }
 
     } else {
@@ -312,19 +290,13 @@ void handleAnyCapsPass(){
      if (lineCapsPassageStarts != currentLineNumber){
        System.out.println( "WARNING -- NEED TO FIX MULTI-"+
            "LINE CAPS PASSAGE START!" );
-       reColl( allLines.get( lineCapsPassageStarts ) );
-       System.out.println( "Updated line: "
-        +getUEB( allLines.get( lineCapsPassageStarts ) ) );
      }
     }
     capsPass.clear();
     lineCapsPassageStarts = 0;
     }
-}
-	
-@Override 
-public void exitSymseq_uc(aPlusParser.Symseq_ucContext ctx) {
-
+}	
+@Override public void exitSymseq_uc(aPlusParser.Symseq_ucContext ctx) {
 
   boolean capsPassage = false;
   if (capseqCnt > 2) {
@@ -333,7 +305,6 @@ public void exitSymseq_uc(aPlusParser.Symseq_ucContext ctx) {
   }
   
   System.out.println( "exitSymseq_uc--CAPS PASSAGE: "+capsPassage ); 
-  //Whole word translated in enter Symseq-uc....
   if (skipLeafierNodes){
    StringBuilder buf;
    System.out.println( "\n   exitSymseq_uc--Input: "+ctx.getText()
@@ -344,31 +315,52 @@ public void exitSymseq_uc(aPlusParser.Symseq_ucContext ctx) {
    return;
   }
 
-  int cnt = ctx.getChildCount();
-  System.out.println( "    exitSymseq-uc child cnt: "+cnt );  
-  StringBuilder buf = new StringBuilder(); 
-  String ink;
-  String brl; 
-   for (int i=0; i<cnt; i++){
-      brl = getUEB( ctx.getChild(i) );
-      //Token child = ctx.getChild(i);
-      //System.out.println( "Child token type: "+child.getType() );
-      if (brl == null){
-        ink = ctx.getChild(i).getText();
-        //if (debug)
-        System.out.println( "  OOPS Missing brl for child: |"+ink+"|" );
-        brl = EasyTrans.getBrl( ink );
-        //if (debug)
-        System.out.println( "\n      -->I got: "+ink+" UEB: "+brl );
-        setUEB( ctx.getChild(i), brl ); //l
+       handleAnyCapsPass();
+/**
+if (capsPass.empty()) return;
+if (!capsPass.empty()){
+    int nodeCnt = capsPass.size();
+    System.out.println( "Potential caps passage--UC nodes: "+
+            nodeCnt );
+    StringBuilder buf;
+
+
+    // Is this always correct, caps word needs term if
+    // not all caps, passage not as strict?
+    if (nodeCnt < 3 ){
+      System.out.println( "   Need some caps word inds. ");
+      for (ParserRuleContext node : capsPass ){
+        //System.out.println( node.getText() );
+       buf = new StringBuilder( capsWordInd ); //Explicit term?
+       buf.append( getUEB( node ) );
+       boolean impTerm = vocabStuff( node, "CAP WORD", "SPACE" );
+       System.out.println( "Terminated by space: "+impTerm );
+       if (!impTerm ) buf.append( "capsTermInd" );
+       setUEB( node, buf.toString() );
+       System.out.println( "Updated: "+getUEB( node ) );
+       reColl( node.getParent() );
       }
-     buf.append( brl );
+
+    } else {
+      System.out.println( " Need to handle caps passage." );
+      //for (ParseTree node : capsPass ){
+       //System.out.println( node.getText() );
+      //}
+      System.out.println( "Passage start: "
+        +capsPass.get( 0 ).getText() );
+      reCollFirst( capsPass.get( 0 ).getParent(), capsPassInd );
+      System.out.println( "Passage end: "
+        +capsPass.get( nodeCnt-1 ).getText());
+      reCollLast( capsPass.get( nodeCnt-1 ).getParent(), 
+          capsTermInd );
+     if (lineCapsPassageStarts != currentLineNumber){
+       System.out.println( "WARNING -- NEED TO FIX MULTI-"+
+           "LINE CAPS PASSAGE START!" );
+     }
     }
-     System.out.println( "exitSymseq-uc--Input: "+ctx.getText()
-              +" UEB: "+ buf.toString());
-     myOutput.println( "exitSymseq-uc--Input: "+ctx.getText()
-              +" UEB: "+ buf.toString());
-     setUEB( ctx, buf.toString() );
+    capsPass.clear();
+    lineCapsPassageStarts = 0;
+  /*  }
 
 
 }//End exitSymseq_uc.
@@ -393,8 +385,17 @@ public void exitSymseq_uc(aPlusParser.Symseq_ucContext ctx) {
    System.exit( 0 );
   } 
 
-//  This item disrupts or terminates any pending possible caps 
-// passageso it's time fix up any caps nodes in the stack.
+
+//AND CHECK THE STACK AND ADD CAPS PASS IND TO THE FIRST
+//GUY AND CAP TERM TO THE LAST OR POP EACH ONE AND GIVE 
+//IT A CAPS WORD IND -- bUT NEED TO UPDATE PARENT?
+// GET PARENT AND UPDATE AT THAT POINT?
+// MULTILINE PASSAGES WILL BE HARDER
+
+   
+
+//  This item disrupts any pending possible caps passage
+// so fix up any caps nodes in the stack.
 
    handleAnyCapsPass();
 
@@ -726,8 +727,7 @@ public void exitMidCon(aPlusParser.MidConContext ctx) {
       " no. of child nodes: "+cnt );
    skipUcLet = false;
     //Translate letters  FIX WORD IND!
-   //StringBuilder buf = new StringBuilder( capsWordInd );
-   StringBuilder buf = new StringBuilder( );
+   StringBuilder buf = new StringBuilder( capsWordInd );
    String brl;
    for (int i=0; i<cnt; i++){
     brl = EasyTrans.getAltBrl( ctx.getChild(i).getText() );

@@ -40,6 +40,42 @@ public class aPlusParserBaseListener implements aPlusParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterAplus(aPlusParser.AplusContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAplus(aPlusParser.AplusContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterPsymseq(aPlusParser.PsymseqContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPsymseq(aPlusParser.PsymseqContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterPsymseq_uc(aPlusParser.Psymseq_ucContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPsymseq_uc(aPlusParser.Psymseq_ucContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterSymseq(aPlusParser.SymseqContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -52,6 +88,54 @@ public class aPlusParserBaseListener implements aPlusParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterSymseq_uc(aPlusParser.Symseq_ucContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSymseq_uc(aPlusParser.Symseq_ucContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterAlphaseq(aPlusParser.AlphaseqContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAlphaseq(aPlusParser.AlphaseqContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterUc_seq(aPlusParser.Uc_seqContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitUc_seq(aPlusParser.Uc_seqContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLetterseq(aPlusParser.LetterseqContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLetterseq(aPlusParser.LetterseqContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterConword(aPlusParser.ConwordContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -59,6 +143,18 @@ public class aPlusParserBaseListener implements aPlusParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitConword(aPlusParser.ConwordContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterConwordUC(aPlusParser.ConwordUCContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitConwordUC(aPlusParser.ConwordUCContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -88,6 +184,18 @@ public class aPlusParserBaseListener implements aPlusParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterFreq_uc(aPlusParser.Freq_ucContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFreq_uc(aPlusParser.Freq_ucContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterFreqword(aPlusParser.FreqwordContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -100,13 +208,25 @@ public class aPlusParserBaseListener implements aPlusParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLetter(aPlusParser.LetterContext ctx) { }
+	@Override public void enterSmall(aPlusParser.SmallContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLetter(aPlusParser.LetterContext ctx) { }
+	@Override public void exitSmall(aPlusParser.SmallContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterG1Letter(aPlusParser.G1LetterContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitG1Letter(aPlusParser.G1LetterContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -136,6 +256,18 @@ public class aPlusParserBaseListener implements aPlusParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterUc_word(aPlusParser.Uc_wordContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitUc_word(aPlusParser.Uc_wordContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterStartconword(aPlusParser.StartconwordContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -143,6 +275,18 @@ public class aPlusParserBaseListener implements aPlusParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitStartconword(aPlusParser.StartconwordContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterStartconWordUC(aPlusParser.StartconWordUCContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitStartconWordUC(aPlusParser.StartconWordUCContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -160,6 +304,18 @@ public class aPlusParserBaseListener implements aPlusParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterMidconworduc(aPlusParser.MidconworducContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMidconworduc(aPlusParser.MidconworducContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterMidendconword(aPlusParser.MidendconwordContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -172,13 +328,61 @@ public class aPlusParserBaseListener implements aPlusParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPunc(aPlusParser.PuncContext ctx) { }
+	@Override public void enterMidendconworduc(aPlusParser.MidendconworducContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitPunc(aPlusParser.PuncContext ctx) { }
+	@Override public void exitMidendconworduc(aPlusParser.MidendconworducContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterPeriod(aPlusParser.PeriodContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPeriod(aPlusParser.PeriodContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSemicolon(aPlusParser.SemicolonContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSemicolon(aPlusParser.SemicolonContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSpunc(aPlusParser.SpuncContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSpunc(aPlusParser.SpuncContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterEpunc(aPlusParser.EpuncContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitEpunc(aPlusParser.EpuncContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -208,18 +412,6 @@ public class aPlusParserBaseListener implements aPlusParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterUc_seq(aPlusParser.Uc_seqContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitUc_seq(aPlusParser.Uc_seqContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterBegCon(aPlusParser.BegConContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -239,6 +431,18 @@ public class aPlusParserBaseListener implements aPlusParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitMidCon(aPlusParser.MidConContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterMidConUC(aPlusParser.MidConUCContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMidConUC(aPlusParser.MidConUCContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -268,18 +472,6 @@ public class aPlusParserBaseListener implements aPlusParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFreaky(aPlusParser.FreakyContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitFreaky(aPlusParser.FreakyContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterAnywhereCon(aPlusParser.AnywhereConContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -292,6 +484,18 @@ public class aPlusParserBaseListener implements aPlusParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterAnywhereConUC(aPlusParser.AnywhereConUCContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAnywhereConUC(aPlusParser.AnywhereConUCContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterMidEndCon(aPlusParser.MidEndConContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -299,6 +503,18 @@ public class aPlusParserBaseListener implements aPlusParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitMidEndCon(aPlusParser.MidEndConContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterMidEndConUC(aPlusParser.MidEndConUCContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMidEndConUC(aPlusParser.MidEndConUCContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -395,54 +611,6 @@ public class aPlusParserBaseListener implements aPlusParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitLiteral(aPlusParser.LiteralContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterItalics(aPlusParser.ItalicsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitItalics(aPlusParser.ItalicsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterBold(aPlusParser.BoldContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitBold(aPlusParser.BoldContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterStart_tag(aPlusParser.Start_tagContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitStart_tag(aPlusParser.Start_tagContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterEnd_tag(aPlusParser.End_tagContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitEnd_tag(aPlusParser.End_tagContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
